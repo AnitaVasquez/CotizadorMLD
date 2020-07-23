@@ -1,0 +1,109 @@
+﻿@model Producto
+
+<link href="~/Content/css/Formulario.css" rel="stylesheet" />
+<script src="~/Content/js/init.js"></script> 
+
+<script>
+    var urlAccionListado = '@Url.Action("Index")';
+    var urlAccionGuardarSubCatalogo = '@Url.Action("CrearProducto")';
+
+    $(document).ready(function () {
+        $("#seccion-titulo-modal").text('@Html.Raw(ViewBag.TituloModal)');
+    });
+
+    $("#guardar-subcatalogo").click(function () {
+        debugger
+        let flag = validarCamposRequeridosFormularioCompleto("form-Producto");
+        if (flag)
+            crearProducto();
+        else
+            toastr.error('@Mensajes.MensajeDatosObligatorios')
+    })
+
+    function crearProducto() {
+        debugger
+        let formulario = $('#form-Producto').serializeObject()
+
+        let data_form = JSON.stringify({ "formulario": formulario })
+        _GuardarModal(data_form, urlAccionGuardarSubCatalogo)
+        //_GuardarGenerico(data_form, urlAccionGuardarSubCatalogo)
+    }
+</script>
+
+<form action="#" id="form-Producto" role="form" data-toggle="validator" method="post" accept-charset="utf-8">
+
+    <div class="col-md-12">
+        @Html.Hidden("IdProducto", Model.IdProducto)
+        @Html.Hidden("Estado", true)
+
+        <br />
+
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="etiqueta-seccion control-label col-md-3">Nombre Producto:<span class="requerido"> *</span></label>
+                <div class="col-md-9">
+                    @Html.Editor("NombreProducto", new
+                        {
+                            htmlAttributes = new
+                            {
+                                @class = "form-control campo-requerido",
+                                maxlength = 150,
+                                @Value = Model.NombreProducto
+                            }
+                        })
+                </div>
+            </div>
+        </div>
+
+        <br />
+        <br />
+
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="etiqueta-seccion control-label col-md-3">PVP:<span class="requerido"> *</span></label>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-usd"></i>
+                            </div>
+                            <input name="PVP" id="PVP" class="campo-decimal-manual-1 form-control campo-requerido" value="@Model.PVP" type="text" maxlength="18" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br />
+        <br />
+
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="etiqueta-seccion control-label col-md-3">Comisión:<span class="requerido"> *</span></label>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-percent"></i>
+                            </div>
+                            <input name="Comision" id="Comision" class="campo-decimal-manual-1 form-control campo-requerido" value="@Model.Comision" type="text" maxlength="18" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br />
+        <br />
+        <br /> 
+    </div> 
+</form>
+
+<div class="row fila-seccion">
+    <div class="col-lg-12" style="text-align: center;">
+        <input id="guardar-subcatalogo" type="button" value="Guardar" class="btn btn-warning" />
+    </div>
+</div> 
+
+
+

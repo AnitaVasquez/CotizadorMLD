@@ -1,0 +1,49 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_LayoutIndex.cshtml";
+}
+<style>
+    .alinear-derecha {
+        text-align: right;
+    }
+</style>
+<div id="cargando-grid"></div>
+
+
+
+@Html.AjaxGrid(Url.Action("IndexGrid"))
+
+@*Para que funcione el progress bar*@
+@section drag {
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+}
+ 
+@section ViewSpecificJavascript {
+    <script>
+        debugger
+        var idGrid = "grid-Cotizador";  
+
+        $(document).click(function (e) {
+
+            var elemento = $(e.currentTarget.activeElement)[0]; 
+
+            if (elemento.id === 'nuevo') {
+                debugger
+                location.href = '@Url.Action("Create", "Cotizador")';
+            } 
+        });
+
+        $(document).keydown(callBackBusqueda);
+        $(document).keypress(callBackBusqueda);
+        $(document).keyup(callBackBusqueda);
+
+        function callBackBusqueda(e) {
+            debugger
+            var elemento = $(e.currentTarget.activeElement)[0];
+            //Validar que los Grids tengan filtros de búsqueda
+            var filtrosBusqueda = document.getElementById('GridSearchGeneral');
+            busquedaGrid(idGrid);
+        }    
+
+    </script>
+} 

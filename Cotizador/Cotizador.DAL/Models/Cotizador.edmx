@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="CotizadorModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Cotizacion">
+          <Key>
+            <PropertyRef Name="IdCotizacion" />
+          </Key>
+          <Property Name="IdCotizacion" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="codigoCotizacion" Type="varchar" MaxLength="50" />
+          <Property Name="FechaCotizacion" Type="datetime" />
+          <Property Name="Cliente" Type="varchar" MaxLength="500" />
+          <Property Name="Producto" Type="varchar" MaxLength="500" />
+          <Property Name="Concepto" Type="varchar" MaxLength="50" />
+          <Property Name="SubtotalCotizacion" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="PorcentajeComision" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="ValorComision" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="PorcentajeIva" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="ValorIva" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="TotalCotizacion" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="Estado" Type="bit" />
+          <Property Name="Version" Type="numeric" Precision="18" Scale="1" />
+        </EntityType>
+        <EntityType Name="DetalleCotizacion">
+          <Key>
+            <PropertyRef Name="IdDetalleCotizador" />
+          </Key>
+          <Property Name="IdDetalleCotizador" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdCotizador" Type="bigint" />
+          <Property Name="IdProducto" Type="bigint" />
+          <Property Name="Cantidad" Type="int" />
+          <Property Name="ValorUnitario" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="CostoTotal" Type="numeric" Precision="18" Scale="2" />
+        </EntityType>
+        <EntityType Name="Producto">
+          <Key>
+            <PropertyRef Name="IdProducto" />
+          </Key>
+          <Property Name="IdProducto" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NombreProducto" Type="varchar" MaxLength="500" />
+          <Property Name="PVP" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="Comision" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="Estado" Type="bit" />
+        </EntityType>
+        <Function Name="ConsultarDetalleCotizacion" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="ConsultarProducto" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="ConsultarSecuencial" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <EntityContainer Name="CotizadorModelStoreContainer">
+          <EntitySet Name="Cotizacion" EntityType="Self.Cotizacion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DetalleCotizacion" EntityType="Self.DetalleCotizacion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Producto" EntityType="Self.Producto" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="CotizadorModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="DetalleCotizacion">
+          <Key>
+            <PropertyRef Name="IdDetalleCotizador" />
+          </Key>
+          <Property Name="IdDetalleCotizador" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdCotizador" Type="Int64" />
+          <Property Name="IdProducto" Type="Int64" />
+          <Property Name="Cantidad" Type="Int32" />
+          <Property Name="ValorUnitario" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="CostoTotal" Type="Decimal" Precision="18" Scale="2" />
+        </EntityType>
+        <EntityType Name="Producto">
+          <Key>
+            <PropertyRef Name="IdProducto" />
+          </Key>
+          <Property Name="IdProducto" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NombreProducto" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="PVP" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="Comision" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="Estado" Type="Boolean" />
+        </EntityType>
+        <EntityContainer Name="CotizadorEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="DetalleCotizacion" EntityType="Self.DetalleCotizacion" />
+          <EntitySet Name="Producto" EntityType="Self.Producto" />
+          <FunctionImport Name="ConsultarProducto" ReturnType="Collection(CotizadorModel.ConsultarProducto)">
+          <Parameter Name="id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="ConsultarDetalleCotizacion" ReturnType="Collection(CotizadorModel.ConsultarDetalleCotizacion)" />
+          <FunctionImport Name="ConsultarSecuencial" ReturnType="Collection(CotizadorModel.ConsultarSecuencial)" />
+          <EntitySet Name="Cotizacion" EntityType="CotizadorModel.Cotizacion" />
+        </EntityContainer>
+        <ComplexType Name="ConsultarProducto">
+          <Property Type="Int64" Name="IdProducto" Nullable="false" />
+          <Property Type="String" Name="NombreProducto" Nullable="true" MaxLength="500" />
+          <Property Type="Decimal" Name="PVP" Nullable="true" Precision="18" Scale="2" />
+          <Property Type="Decimal" Name="Comision" Nullable="true" Precision="18" Scale="2" />
+          <Property Type="Boolean" Name="Estado" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="ConsultarDetalleCotizacion">
+          <Property Type="String" Name="NombreProducto" Nullable="true" MaxLength="500" />
+          <Property Type="Int64" Name="IdDetalleCotizador" Nullable="false" />
+          <Property Type="Int64" Name="IdCotizador" Nullable="true" />
+          <Property Type="Int64" Name="IdProducto" Nullable="true" />
+          <Property Type="Int32" Name="Cantidad" Nullable="true" />
+          <Property Type="Decimal" Name="ValorUnitario" Nullable="true" Precision="18" Scale="2" />
+          <Property Type="Decimal" Name="CostoTotal" Nullable="true" Precision="18" Scale="2" />
+        </ComplexType>
+        <ComplexType Name="ConsultarSecuencial">
+          <Property Type="Int64" Name="secuencial" Nullable="true" />
+        </ComplexType>
+        <EntityType Name="Cotizacion">
+          <Key>
+            <PropertyRef Name="IdCotizacion" />
+          </Key>
+          <Property Name="IdCotizacion" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="codigoCotizacion" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FechaCotizacion" Type="DateTime" Precision="3" />
+          <Property Name="Cliente" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Producto" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Concepto" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SubtotalCotizacion" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="PorcentajeComision" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="ValorComision" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="PorcentajeIva" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="ValorIva" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="TotalCotizacion" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="Estado" Type="Boolean" />
+          <Property Name="Version" Type="Decimal" Precision="18" Scale="1" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CotizadorModelStoreContainer" CdmEntityContainer="CotizadorEntities">
+          <EntitySetMapping Name="DetalleCotizacion">
+            <EntityTypeMapping TypeName="CotizadorModel.DetalleCotizacion">
+              <MappingFragment StoreEntitySet="DetalleCotizacion">
+                <ScalarProperty Name="IdDetalleCotizador" ColumnName="IdDetalleCotizador" />
+                <ScalarProperty Name="IdCotizador" ColumnName="IdCotizador" />
+                <ScalarProperty Name="IdProducto" ColumnName="IdProducto" />
+                <ScalarProperty Name="Cantidad" ColumnName="Cantidad" />
+                <ScalarProperty Name="ValorUnitario" ColumnName="ValorUnitario" />
+                <ScalarProperty Name="CostoTotal" ColumnName="CostoTotal" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Producto">
+            <EntityTypeMapping TypeName="CotizadorModel.Producto">
+              <MappingFragment StoreEntitySet="Producto">
+                <ScalarProperty Name="IdProducto" ColumnName="IdProducto" />
+                <ScalarProperty Name="NombreProducto" ColumnName="NombreProducto" />
+                <ScalarProperty Name="PVP" ColumnName="PVP" />
+                <ScalarProperty Name="Comision" ColumnName="Comision" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="ConsultarProducto" FunctionName="CotizadorModel.Store.ConsultarProducto">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="CotizadorModel.ConsultarProducto">
+                <ScalarProperty Name="IdProducto" ColumnName="IdProducto" />
+                <ScalarProperty Name="NombreProducto" ColumnName="NombreProducto" />
+                <ScalarProperty Name="PVP" ColumnName="PVP" />
+                <ScalarProperty Name="Comision" ColumnName="Comision" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="ConsultarDetalleCotizacion" FunctionName="CotizadorModel.Store.ConsultarDetalleCotizacion">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="CotizadorModel.ConsultarDetalleCotizacion">
+                <ScalarProperty Name="NombreProducto" ColumnName="NombreProducto" />
+                <ScalarProperty Name="IdDetalleCotizador" ColumnName="IdDetalleCotizador" />
+                <ScalarProperty Name="IdCotizador" ColumnName="IdCotizador" />
+                <ScalarProperty Name="IdProducto" ColumnName="IdProducto" />
+                <ScalarProperty Name="Cantidad" ColumnName="Cantidad" />
+                <ScalarProperty Name="ValorUnitario" ColumnName="ValorUnitario" />
+                <ScalarProperty Name="CostoTotal" ColumnName="CostoTotal" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="ConsultarSecuencial" FunctionName="CotizadorModel.Store.ConsultarSecuencial">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="CotizadorModel.ConsultarSecuencial">
+                <ScalarProperty Name="secuencial" ColumnName="secuencial" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="Cotizacion">
+            <EntityTypeMapping TypeName="CotizadorModel.Cotizacion">
+              <MappingFragment StoreEntitySet="Cotizacion">
+                <ScalarProperty Name="Version" ColumnName="Version" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+                <ScalarProperty Name="TotalCotizacion" ColumnName="TotalCotizacion" />
+                <ScalarProperty Name="ValorIva" ColumnName="ValorIva" />
+                <ScalarProperty Name="PorcentajeIva" ColumnName="PorcentajeIva" />
+                <ScalarProperty Name="ValorComision" ColumnName="ValorComision" />
+                <ScalarProperty Name="PorcentajeComision" ColumnName="PorcentajeComision" />
+                <ScalarProperty Name="SubtotalCotizacion" ColumnName="SubtotalCotizacion" />
+                <ScalarProperty Name="Concepto" ColumnName="Concepto" />
+                <ScalarProperty Name="Producto" ColumnName="Producto" />
+                <ScalarProperty Name="Cliente" ColumnName="Cliente" />
+                <ScalarProperty Name="FechaCotizacion" ColumnName="FechaCotizacion" />
+                <ScalarProperty Name="codigoCotizacion" ColumnName="codigoCotizacion" />
+                <ScalarProperty Name="IdCotizacion" ColumnName="IdCotizacion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="false" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

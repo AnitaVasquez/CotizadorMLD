@@ -1,0 +1,549 @@
+﻿@model Cotizacion
+
+@using Cotizador.DAL.Methods
+
+@{
+    ViewBag.Title = "Cotizacion";
+    Layout = "~/Views/Shared/_LayoutSecundario.cshtml";
+    var listadoProductos = (List<ConsultarDetalleCotizacion>)ViewBag.detalleCotizacion;
+}
+
+<link href="~/Content/css/Formulario.css" rel="stylesheet" />
+<link href="~/Content/css/select2.min.css" rel="stylesheet" />
+
+<style>
+    /* OCULTAR COLUMNAS ID DE LAS TABLAS DINAMICAS */
+    #tbl-Productos tr > *:nth-child(1) {
+        display: none;
+    }
+</style>
+
+<style>
+    .fila-seccion {
+        margin-bottom: 15px;
+    }
+
+    .etiqueta-seccion {
+        text-align: right;
+    }
+
+    .input-bloqueado {
+        pointer-events: none;
+    }
+
+    .alinear-derecha {
+        text-align: right;
+        min-width: 15em;
+    }
+</style>
+
+<div class="panel">
+    <hr style="border:none" />
+
+    <div class="panel-body">
+        <form action="#" id="form-cotizacion" role="form" data-toggle="validator" method="post" accept-charset="utf-8">
+
+
+            <div class="row fila-seccion">
+                <div class="col-xs-2" style="text-align: right;">
+                    <img src="~/Content/img/editar.png" />
+                </div>
+                <div class="col-xs-6" style="text-align: left; align-items:center">
+                    <p style="font-family:Corbel; font-size:66px">Editar Cotización</p>
+                </div>
+                <div class="col-xs-3" style="text-align: right; align-items:center;">
+                    @Html.ActionLink("Ver Listado Cotizaciones", "Index", null, new { @class = "btn btn-info" }, new { style = "font-family:Corbel; font-size: 28px; color:darkblue" })
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="box box-default">
+                        <div class="box-header with-border">
+                            <p style="font-family:Corbel; font-size:30px" id="texto-informacion-principal" class="box-title">Datos Generales </p>
+                        </div>
+                        <br />
+                        <div class="box-body">
+                            <div class="row fila-seccion">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.Hidden("IdCotizacion", Model.IdCotizacion)
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="etiqueta-seccion control-label col-md-4">Fecha de Cotización: </label>
+                                        <div class="col-md-8">
+                                            @Html.Editor("FechaCotizacion", new { htmlAttributes = new { @class = "form-control", @Value = System.DateTime.Now.ToString("yyyy/MM/dd"), disabled = "disabled" } })
+                                            @Html.Hidden("FechaCotizacion", System.DateTime.Now.ToString("yyyy/MM/dd"))
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row fila-seccion">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="etiqueta-seccion control-label col-md-1">Cliente: <span class="requerido"> *</span></label>
+                                        <div class="col-md-11" onkeypress="return soloLetras(event)">
+                                            @Html.Editor("Cliente", new { htmlAttributes = new { @class = "form-control campo-requerido", required = "", maxlength = "150" } })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row fila-seccion">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="etiqueta-seccion control-label col-md-1">Producto: <span class="requerido"> *</span></label>
+                                        <div class="col-md-11" onkeypress="return soloLetras(event)">
+                                            @Html.Editor("Producto", new { htmlAttributes = new { @class = "form-control campo-requerido", required = "", maxlength = "150" } })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row fila-seccion">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="etiqueta-seccion control-label col-md-1">Concepto: <span class="requerido"> *</span></label>
+                                        <div class="col-md-11">
+                                            @Html.Editor("Concepto", new { htmlAttributes = new { @class = "form-control  campo-requerido", required = "", maxlength = "150" } })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="box box-default">
+                        <div class="box-header with-border">
+                            <p style="font-family:Corbel; font-size:30px" id="texto-informacion-principal" class="box-title">Detalle Cotización </p>
+                        </div>
+                        <div class="box-body">
+                            <div class="row fila-seccion">
+                                <div class="col-md-12">
+                                    <table class="table productos table-responsive" id="tbl-Productos">
+                                        <thead>
+                                            <tr>
+                                                <th data-override="IdDetalleCotizador" width="0%">#</th>
+                                                <th data-override="IdProducto" width="77%">Descripción</th>
+                                                <th data-override="Cantidad" width="5%">Cantidad</th>
+                                                <th data-override="ValorUnitario" width="9%">Precio Unitario</th>
+                                                <th data-override="CostoTotal" width="9%">Total</th>
+                                            </tr>
+                                            <tr id="templateProductos">
+                                                <td><input type="text" class="form-control idObjeto" value="0" name="IDDetalleProductos[]" hidden /></td>
+
+                                                <td>
+                                                    @Html.DropDownList("IdProducto", (List<SelectListItem>)ProductosDAL.ObtenerListadoProductos(), Etiquetas.TituloComboVacio, new { @class = "form-control seleccion js-example-basic-single" })
+                                                </td>
+
+                                                <td><input id="Cantidad" type="text" class="form-control" placeholder="0" name="Cantidad[]" maxlength="5" onkeypress="if(isNaN(String.fromCharCode(event.keyCode))) return false;" /></td>
+
+                                                <td><input id="ValorUnitario" type="text" class="campo-decimal-manual-1  form-control" placeholder="0.00" style="text-align:right" name="ValorUnitario[]" readonly="" /></td>
+
+                                                <td><input id="CostoTotal" type="text" class="campo-decimal-manual-1  form-control" placeholder="0.00" style="text-align:right" name="CostoTotal[]" readonly="" /></td>
+
+                                                <td id="accion">
+                                                    <button id="addrow" type="button" class="btn btn-success"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in listadoProductos)
+                                            {
+                                                <tr id="templateProductos">
+                                                    <td><input type="text" class="form-control IdProducto" value="@item.IdProducto" name="IdProducto-@item.IdDetalleCotizador" hidden /></td>
+
+                                                    <td><input id="IdProducto" type="text" class="form-control" placeholder="0" maxlength="5" name="IdProducto- @item.IdDetalleCotizador" value="@item.NombreProducto" readonly="" /></td>
+
+                                                    <td><input id="Cantidad" type="text" class="form-control" placeholder="0" name="Cantidad- @item.IdDetalleCotizador" maxlength="5" value="@item.Cantidad" readonly="" /></td>
+
+                                                    <td><input id="ValorUnitario" type="text" class="campo-decimal-manual-1  form-control" name="ValorUnitario- @item.IdDetalleCotizador" placeholder="0.00" style="text-align:right" value="@item.ValorUnitario" readonly="" /></td>
+
+                                                    <td><input id="CostoTotal" type="text" class="campo-decimal-manual-1  form-control costo-total-cotizacion" name="CostoTotal- @item.IdDetalleCotizador" placeholder="0.00" style="text-align:right" value="@item.CostoTotal" readonly="" /></td>
+
+                                                    <td id="accion">
+                                                        <button type="button" class="ibtnDel btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="row fila-seccion">
+                    <div class="col-md-12">
+                        <div class="form-group col-md-10 alinear-padding" style="text-align: right;">
+                            <label title="Subtotal sin Descuento" class="etiqueta-seccion control-label alinear-derecha">Subtotal:</label>
+                        </div>
+                        <div class="calculos col-md-2 alinear-padding" style="text-align: left;" width="4%">
+                            <div class="input-group">
+                                <span class="input-group-addon">US$</span>
+                                @Html.Editor("SubtotalCotizacion", new { htmlAttributes = new { @class = "form-control input-bloqueado alinear-derecha", @Value = Model.SubtotalCotizacion, @ReadOnly = true } })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row fila-seccion">
+                    <div class="col-md-12">
+                        <div class="form-group col-md-10 alinear-padding" style="text-align: right;">
+                            <label title="Subtotal sin Descuento" class="etiqueta-seccion control-label alinear-derecha">% Comisión:</label>
+                        </div>
+                        <div class="calculos col-md-2 alinear-padding" style="text-align: left;" width="4%">
+                            <div class="input-group">
+                                <span class="input-group-addon">( % )</span>
+                                @Html.Editor("PorcentajeComision", new { htmlAttributes = new { @class = "PorcentajeComision campo-decimal-manual-1 campo-requerido form-control alinear-derecha", @Value = Model.PorcentajeComision } })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row fila-seccion">
+                    <div class="col-md-12">
+                        <div class="form-group col-md-10 alinear-padding" style="text-align: right;">
+                            <label title="Subtotal sin Descuento" class="etiqueta-seccion control-label alinear-derecha">Valor Comisión:</label>
+                        </div>
+                        <div class="calculos col-md-2 alinear-padding" style="text-align: left;" width="4%">
+                            <div class="input-group">
+                                <span class="input-group-addon">US$</span>
+                                @Html.Editor("ValorComision", new { htmlAttributes = new { @class = "form-control campo-decimal-manual-1 input-bloqueado alinear-derecha", @Value = Model.ValorComision, @ReadOnly = true } })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row fila-seccion">
+                    <div class="col-md-12">
+                        <div class="form-group col-md-10 alinear-padding" style="text-align: right;">
+                            <label title="Subtotal sin Descuento" class="etiqueta-seccion control-label alinear-derecha">Total:</label>
+                        </div>
+                        <div class="calculos col-md-2 alinear-padding" style="text-align: left;" width="4%">
+                            <div class="input-group">
+                                <span class="input-group-addon">US$</span>
+                                @Html.Editor("TotalCotizacion", new { htmlAttributes = new { @class = "form-control campo-decimal-manual-1 input-bloqueado alinear-derecha", @Value = Model.TotalCotizacion, @ReadOnly = true } })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-body">
+
+                <div class="row fila-seccion">
+                    <div class="col-xs-6" style="text-align: right;">
+                        <input id="guardar" type="button" value="Guardar" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section ViewSpecificJavascript
+{
+    <script>
+        var urlAccionListado = '@Url.Action("Create")';
+        var urlGuardar = '@Url.Action("Edit")';
+        var urlDescargar = '@Url.Action("GeneraCotizadorPDF", "Cotizador")';
+        var urlAccionGuardarCodigoCotizacion = '@Url.Action("_CrearProducto", "Producto")';
+        var contador = 0;
+
+        //Arreglo de objeto para enviar al controlador
+        var listadoProductos = @Html.Raw(Json.Encode(ViewBag.detalleCotizacion));
+        var counter = 0;
+
+        $(document).ready(function () {
+
+            //setear a dos decimales el porcentaje de comsion
+            var descuento = ($("#PorcentajeComision").val());
+            descuento = parseFloat(descuento).toFixed(2);
+            document.getElementById("PorcentajeComision").value = descuento;
+
+            $("#addrow").on("click", function () {
+                debugger
+                var productoSeleccionado = $("#IdProducto").val();
+
+                if (productoSeleccionado.length === 0) {
+                    toastr.error('Seleccione un Material Suelto.')
+                    return;
+                }
+
+                var CantidadProducto = $('#Cantidad').val();
+
+                if (CantidadProducto == 0 || CantidadProducto == "0,00") {
+                    toastr.error('La Cantidad debe ser mayor a cero')
+                    return;
+                }
+
+                var ValorUnitario = parseFloat(document.getElementById("ValorUnitario").value).toFixed(2);
+                var CostoTotal = parseFloat(document.getElementById("CostoTotal").value).toFixed(2);
+
+
+                var busqueda = listadoProductos.filter(function (el) { return el.IdProducto === productoSeleccionado; });
+                if (busqueda.length > 0) {
+                    toastr.error('El Material Suelto ya se encuentra regsitrado')
+                    return;
+                }
+
+                var newRow = $("<tr>");
+                var cols = "";
+
+                var ProductoSeleccionadoTexto = $("#IdProducto option:selected").text();
+
+                cols += '<td style="display: none;"><input type="text" class="form-control" name="IdProducto' + counter + '" value ="' + productoSeleccionado + '" disabled/>  </td>';
+                cols += '<td><input type="text" class="form-control" name="ProdcutoNombre' + counter + '" value ="' + ProductoSeleccionadoTexto + '" disabled/>  </td>';
+                cols += '<td><input type="text" class="form-control" name="Cantidad' + counter + '" value ="' + CantidadProducto + '" disabled/>  </td>';
+                cols += '<td><input type="text" style="text-align:right" class="campo-decimal-manual-1  form-control" name="ValorUnitario' + counter + '" value ="' + ValorUnitario + '" disabled/>  </td>';
+                cols += '<td><input type="text" style="text-align:right" class="campo-decimal-manual-1  form-control costo-total-cotizacion" name="CostoTotal' + counter + '" value ="' + CostoTotal + '" disabled/>  </td>';
+                cols += '<td><button type="button" class="ibtnDel btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button></td>';
+
+                newRow.append(cols);
+                $("table.productos").append(newRow);
+                counter++;
+
+                calcularTotalCotizacion();
+
+                listadoProductos.push({
+                    "IdProducto": productoSeleccionado,
+                    "Cantidad": CantidadProducto,
+                    "ValorUnitario": ValorUnitario,
+                    "CostoTotal": CostoTotal
+                })
+
+
+                //limpiar campos
+                $('#IdProducto').val('').trigger('change')
+                document.getElementById("Cantidad").value = 0;
+                document.getElementById("ValorUnitario").value = "0.00";
+                document.getElementById("CostoTotal").value = "0.00";
+
+
+            });
+
+            $("table.productos").on("click", ".ibtnDel", function (event) {
+                debugger
+                var item = $(this).closest("tr");
+                var td = $(item).find("td:first");
+                var input = $(td).find("input")
+                var codigo = $(input).val();
+
+                $(this).closest("tr").remove();
+                counter -= 1
+
+                calcularTotalCotizacion()
+
+                listadoProductos = listadoProductos.filter(function (el) { return el.IdProducto != codigo });
+            });
+
+            $('.costo-total-cotizacion').change(function () {
+                debugger
+                var sumatoriaTotal = 0;
+                $.each(elementosSumatoriaProyecto, function () {
+                    debugger
+                    var valor = $(this).val() === null || $(this).val() === undefined ? 0 : $(this).val();
+
+                })
+
+                $("#TotlaCotizacion").val(sumatoriaTotal);
+
+            });
+
+        });
+
+
+        function calcularTotalCotizacion() {
+            debugger
+            var sumatoriaTotal = 0;
+            var sumatoriaTotalComision = 0;
+            var valorComision = 0;
+            var elementosSumatoriaProyecto = $(".costo-total-cotizacion");
+            $.each(elementosSumatoriaProyecto, function () {
+                debugger
+                var valor = $(this).val() === null || $(this).val() === undefined ? 0 : $(this).val();
+                sumatoriaTotal += parseFloat(valor);
+            })
+
+            sumatoriaTotal = parseFloat(sumatoriaTotal).toFixed(2);
+            $("#SubtotalCotizacion").val(sumatoriaTotal);
+
+            //calcular el Total
+            var descuento = ($("#PorcentajeComision").val());
+            descuento = parseFloat(descuento).toFixed(2);
+
+            valorComision = ((parseFloat(sumatoriaTotal) * parseFloat(descuento)) / 100)
+            $("#ValorComision").val(parseFloat(valorComision).toFixed(2));
+
+            sumatoriaTotalComision = ((parseFloat(sumatoriaTotal) * parseFloat(descuento)) / 100) + parseFloat(sumatoriaTotal)
+            $("#TotalCotizacion").val(parseFloat(sumatoriaTotalComision).toFixed(2));
+
+        }
+
+        //Calcular valores cuando Cambia el Producto
+        $("#IdProducto").change(function () {
+            debugger;
+            cargarCostosProducto();
+        });
+
+        //Calcular valores cuando Cambia el Porcentaje Comision
+        $("#PorcentajeComision").change(function () {
+            debugger;
+            var descuento = ($("#PorcentajeComision").val());
+            descuento = parseFloat(descuento).toFixed(2);
+            document.getElementById("PorcentajeComision").value = descuento;
+
+            calcularTotalCotizacion();
+        });
+
+        //Calcular valores cuando Cambia la Cantidad
+        $("#Cantidad").change(function () {
+            cargarCostosProducto();
+        });
+
+        //obtener el valor del producto
+        function cargarCostosProducto() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetValoresProducto")',
+                dataType: 'json',
+                data: { id: $("#IdProducto").val() },
+                success: function(data) {
+                                    var valor = parseFloat(data.PVP).toFixed(2);
+                                    var total = $("#Cantidad").val() * valor;
+                                    total = parseFloat(total).toFixed(2);
+
+                                    if ($("#Cantidad").val() == 0)
+                    {
+                                        document.getElementById("Cantidad").value = 1;
+                                        document.getElementById("ValorUnitario").value = valor;
+                                        document.getElementById("CostoTotal").value = valor;
+                                    }
+                    else
+                    {
+                                        document.getElementById("ValorUnitario").value = valor;
+                                        document.getElementById("CostoTotal").value = total;
+                                    }
+
+                                },
+                error: function(ex) {
+                                    //toastr.error(ex)
+                                    console.log(ex)
+                }
+            });
+        };
+
+
+        $("#guardar").click(function () {
+            var flag = validarCamposRequeridosFormularioCompleto("form-cotizacion");
+            if (flag)
+                guardar();
+            else
+                toastr.error('@Mensajes.MensajeDatosObligatorios')
+        });
+
+
+
+        function guardar() {
+            debugger
+
+            var productoSeleccionado = $("#IdProducto").val();
+            var cantidadProducto = $('#Cantidad').val();
+
+            if (productoSeleccionado.length > 0 && (cantidadProducto != 0 || cantidadProducto != "0.00")) {
+                toastr.error('Tiene un detalle pendiente de agregar');
+                return;
+            }
+            else {
+                debugger
+                //si todo esta correcto
+                var data_form = JSON.stringify({ "cotizacion": $('#form-cotizacion').serializeObject(), "productos": listadoProductos })
+                _GuardarDescargar(data_form, urlGuardar, urlGuardar, urlDescargar);
+
+                debugger
+
+                setTimeout(function () {
+                    window.location.replace(urlAccionListado);
+                }, 2000);
+            }
+        }
+
+    //funcion crear nuevo producto
+    function AgregarProducto(codigo)
+    {
+        _GetCreate({ codigoCatalogo: codigo}, urlAccionAgregarProducto);
+            $('#contenido-modal').modal({
+            'show': 'true',
+                'backdrop': 'static',
+                'keyboard': false
+            });
+        return;
+    }
+
+    </script>
+
+    <script>
+    $(document).ready(function () {
+
+        $("#IdProducto").select2({
+            //language: "tr",//don't forget to add language script (select2/js/i18n/tr.js)
+            minimumInputLength: 0, //for listing all records > set 0
+            maximumInputLength: 20, //only allow terms up to 20 characters long
+            multiple: false,
+            placeholder: '@Etiquetas.TituloComboVacio',
+            allowClear: true,
+            tags: false, //prevent free text entry
+            "language": {
+                "noResults": function () {
+                    return '@Mensajes.MensajeNoDataListado';
+                },
+                "searching": function () {
+                    return '@Mensajes.MensajeBuscandoListado';
+                }
+            },
+            width: "100%",
+            ajax: {
+                url: '@Url.Action("GetProductos", "Cotizador")',
+                dataType: 'json',
+                delay: 100,
+                data: function (params) {
+                    return {
+                        query: params.term, //search term
+                        codigo: 'INSTITUCION-ESTUDIO-01',
+                        page: params.page,
+                    };
+                },@Html.Hidden("IdCotizacion", Model.IdCotizacion)
+                processResults: function (data, page) {
+                    var newData = [];
+                    $.each(data, function (index, item) {
+                        newData.push({
+                            //id part present in data
+                            id: item.Value,
+                            //string to be displayed
+                            text: item.Text
+                        });
+                    });
+                    return { results: newData };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }
+        });
+    })
+    </script>
+
+    <script src="~/Content/js/plugins/select2/select2.min.js"></script>
+    <script src="~/Content/js/TablaDinamica.js"></script>
+}
