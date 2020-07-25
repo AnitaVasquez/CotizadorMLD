@@ -206,7 +206,7 @@ namespace Cotizador.UI.Controllers
                 instance.ScalePercent(10f); 
 
                 //Titulo
-                PdfPCell TituloCotizador = new PdfPCell(new Phrase("DEPARTAMENTO DE PRODUCCIÓN AUTIOVISUAL  -  COTIZACIÓN N° " + cabeceraCotizacion.codigoCotizacion + "      ", new Font(customfontbold, 9, 0, new BaseColor(255, 255, 255))));
+                PdfPCell TituloCotizador = new PdfPCell(new Phrase("DEPARTAMENTO DE PRODUCCIÓN AUDIOVISUAL  -  COTIZACIÓN N° " + cabeceraCotizacion.codigoCotizacion + "      ", new Font(customfontbold, 9, 0, new BaseColor(255, 255, 255))));
                 TituloCotizador.Rowspan = 2;
                 TituloCotizador.Colspan = 5;
                 TituloCotizador.Border = Rectangle.NO_BORDER;
