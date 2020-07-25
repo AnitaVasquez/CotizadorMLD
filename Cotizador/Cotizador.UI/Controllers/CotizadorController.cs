@@ -213,7 +213,7 @@ namespace Cotizador.UI.Controllers
                 TituloCotizador.HorizontalAlignment = Element.ALIGN_RIGHT;
                 TituloCotizador.VerticalAlignment = Element.ALIGN_MIDDLE;
                 TituloCotizador.BackgroundColor = new BaseColor(60, 66, 82);
-                TituloCotizador.FixedHeight = 50f;
+                TituloCotizador.FixedHeight = 50f; 
 
                 //Version
                 PdfPCell VersionCotizador = new PdfPCell(new Phrase("Versión  " + cabeceraCotizacion.Version.ToString().Replace(",", "."), new Font(customfontbold, 7, 0, new BaseColor(60, 66, 82))));
